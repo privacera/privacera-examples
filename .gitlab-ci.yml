@@ -48,6 +48,6 @@ sync_to_github:
     - git config --global user.name "dbosco"
     - git config --global user.email "bosco@privacera.com"
     - git remote add github git@github.com:privacera/privacera-examples.git
-    - git push --mirror github
+    - git push github main --force
   only:
     - main
