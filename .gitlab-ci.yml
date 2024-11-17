@@ -31,3 +31,22 @@ build_access_dataserver:
 #  only:
 #    changes:
 #      - subdirectory3/**/*
+
+
+sync_to_github:
+  stage: sync
+  before_script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - echo "$DEPLOY_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh  # Restrict permissions for the .ssh directory
+    - ssh-keyscan github.com >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts  # Set appropriate permissions for known_hosts
+  script:
+    - git config --global user.name "dbosco"
+    - git config --global user.email "bosco@privacera.com"
+    - git remote add github git@github.com:privacera/privacera-examples.git
+    - git push --mirror github
+  only:
+    - main
