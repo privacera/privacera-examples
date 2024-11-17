@@ -21,6 +21,14 @@ build_access_dataserver:
       - access/dataserver/**/*
 
 
+# Periodic job to test all subfolders
+test_all_subfolders:
+  stage: build
+  script:
+    - cd access/dataserver && mvn clean install && cd ../..
+  only:
+    - schedules  # Runs only on a schedule
+
 # Job for building Python project in subdirectory3
 #build_subdirectory3:
 #  stage: build
