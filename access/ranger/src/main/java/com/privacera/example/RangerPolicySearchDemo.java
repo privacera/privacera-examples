@@ -17,6 +17,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.ranger.RangerClient;
 import org.apache.ranger.RangerServiceException;
 import org.apache.ranger.plugin.model.RangerPolicy;
+import org.apache.ranger.plugin.model.RangerRole;
 
 public class RangerPolicySearchDemo {
 
@@ -32,6 +33,7 @@ public class RangerPolicySearchDemo {
         .create('k');
     Option user = OptionBuilder.hasArgs(1).isRequired().withLongOpt("user").withDescription("username").create('u');
     Option pass = OptionBuilder.hasArgs(1).isRequired().withLongOpt("pass").withDescription("password").create('p');
+    // Optional for SSL configuration
     Option conf = OptionBuilder.hasArgs(1).withLongOpt("config").withDescription("configuration").create('c');
 
     options.addOption(host);
@@ -55,7 +57,7 @@ public class RangerPolicySearchDemo {
     String cfg = cmd.getOptionValue('c');
     String authType = cmd.getOptionValue('k');
 
-
+    // Create Ranger client using the hostname, authentication type, username, password and configuration file
     RangerClient rangerClient = new RangerClient(hostName, authType, userName, password, cfg);
 
     // Creating policy
