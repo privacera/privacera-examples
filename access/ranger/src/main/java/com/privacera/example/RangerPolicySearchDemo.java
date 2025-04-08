@@ -1,12 +1,10 @@
 package com.privacera.example;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -19,10 +17,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.ranger.RangerClient;
 import org.apache.ranger.RangerServiceException;
 import org.apache.ranger.plugin.model.RangerPolicy;
-import org.apache.ranger.plugin.model.RangerPrincipal;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 public class RangerPolicySearchDemo {
 
@@ -30,7 +24,7 @@ public class RangerPolicySearchDemo {
   private static final String RANGER_SERVICE_TYPE = "s3";
 
   public static void main(String[] args) throws RangerServiceException {
-//    Gson gsonBuilder = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").setPrettyPrinting().create();
+
     Options options = new Options();
 
     Option host = OptionBuilder.hasArgs(1).isRequired().withLongOpt("host").withDescription("hostname").create('h');
