@@ -64,10 +64,10 @@ public class RangerPolicySearchDemo {
 
     RangerClient rangerClient = new RangerClient(hostName, authType, userName, password, cfg);
 
+    // Creating policy
     RangerPolicy rangerPolicy = generateRangerPolicy(RANGER_SERVICE_TYPE, RANGER_SERVICE );
-//
-//    RangerPolicy savedPolicy = rangerClient.createPolicy(rangerPolicy);
-//    System.out.println("Created policy: " + savedPolicy.getId() + " with name: " + savedPolicy.getName());
+    RangerPolicy savedPolicy = rangerClient.createPolicy(rangerPolicy);
+    System.out.println("Created policy: " + savedPolicy.getId() + " with name: " + savedPolicy.getName());
 
     //Search for policies for a given user
     Map<String, String> userFilter = new HashMap<>();
@@ -93,7 +93,13 @@ public class RangerPolicySearchDemo {
     // Search for policies for a given resource
     Map<String, String> filter = new HashMap<>();
     filter.put("zoneName", "SZ-1");
+    // Ranger, the policyType field refers to the type of the policy.
+    // 0	Access Policy (default)
+    // 1	Data Masking Policy
+    // 2	Row Filtering Policy
     filter.put("policyType", "0");
+
+    //Resource fields are available in the Service definition
     filter.put("resource:bucketname", "bucket2025");
     filter.put("resource:objectpath", "/data/04042025/*");
     filter.put("resourceMatchScope", "self");
