@@ -9,7 +9,7 @@
   <logger name="org.apache.commons.logging" level="info">
     <appender-ref ref="Console" />
   </logger>
-  <logger name="com.privacera.demo" level="info">
+  <logger name="com.privacera.example" level="info">
     <appender-ref ref="Console" />
   </logger>
   <logger name="org.apache.ranger.plugin.policyengine" level="info">
