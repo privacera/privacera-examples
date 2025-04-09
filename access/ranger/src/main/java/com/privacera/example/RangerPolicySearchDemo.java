@@ -60,35 +60,38 @@ public class RangerPolicySearchDemo {
     // Create Ranger client using the hostname, authentication type, username, password and configuration file
     RangerClient rangerClient = new RangerClient(hostName, authType, userName, password, cfg);
 
-    // Creating policy
-    RangerPolicy rangerPolicy = generateRangerPolicy(RANGER_SERVICE_TYPE, RANGER_SERVICE );
-    RangerPolicy savedPolicy = rangerClient.createPolicy(rangerPolicy);
-    System.out.println("Created policy: " + savedPolicy.getId() + " with name: " + savedPolicy.getName());
+    // Creating policy for bucket2025/dir1
+    RangerPolicy rangerPolicy = generateRangerPolicy(RANGER_SERVICE_TYPE, RANGER_SERVICE, "bucket2025", "dir1");
+    rangerPolicy = rangerClient.createPolicy(rangerPolicy);
+    System.out.println("Created policy: " + rangerPolicy.getId() + " with name: " + rangerPolicy.getName());
+
+    // Creating policy for bucket2025/dir1/dir2
+    RangerPolicy rangerPolicy1 = generateRangerPolicy(RANGER_SERVICE_TYPE, RANGER_SERVICE, "bucket2025", "dir1/dir2");
+    rangerPolicy1 = rangerClient.createPolicy(rangerPolicy1);
+    System.out.println("Created policy: " + rangerPolicy1.getId() + " with name: " + rangerPolicy1.getName());
 
     //Search for policies for a given user
     Map<String, String> userFilter = new HashMap<>();
     userFilter.put("user", "user1");
     userFilter.put("serviceName", "privacera_s3");
-    userFilter.put("zoneName", "SZ-1");
 
     List<RangerPolicy> userPolicyList = rangerClient.findPolicies(userFilter);
     if (CollectionUtils.isNotEmpty(userPolicyList)) {
-      System.out.println("Found " + userPolicyList.size() + " policies for user");
+      System.out.println("Found " + userPolicyList.size() + " policies for user : user1");
     }
 
     //Search for policies for a given role
     Map<String, String> roleFilter = new HashMap<>();
     roleFilter.put("role", "ROLE_1");
     roleFilter.put("serviceName", "privacera_s3");
-    roleFilter.put("zoneName", "SZ-1");
     List<RangerPolicy> rolePolicyList = rangerClient.findPolicies(roleFilter);
     if (CollectionUtils.isNotEmpty(rolePolicyList)) {
-      System.out.println("Found " + rolePolicyList.size() + " policies for role");
+      System.out.println("Found " + rolePolicyList.size() + " policies for role : ROLE_1");
     }
 
     // Search for policies for a given resource
     Map<String, String> filter = new HashMap<>();
-    filter.put("zoneName", "SZ-1");
+
     // Ranger, the policyType field refers to the type of the policy.
     // 0	Access Policy (default)
     // 1	Data Masking Policy
@@ -97,30 +100,82 @@ public class RangerPolicySearchDemo {
 
     //Resource fields are available in the Service definition
     filter.put("resource:bucketname", "bucket2025");
-    filter.put("resource:objectpath", "/data/04042025/*");
-    filter.put("resourceMatchScope", "self");
+    filter.put("resource:objectpath", "dir1");
+    // Ranger service name
     filter.put("serviceName", "privacera_s3");
+
     List<RangerPolicy> policyList = rangerClient.findPolicies(filter);
     if (CollectionUtils.isNotEmpty(policyList)) {
-      System.out.println("Found " + policyList.size() + " policies");
+      // Without resourceMatchScope - Retrieves policies that exactly match the specified resource, along with wildcard policies such as default policies.
+      // all - bucketname, objectpath
+      // Policy for bucket2025/dir1
+      System.out.println("Found " + policyList.size() + " policies for resource without 'resourceMatchScope'");
+      for (RangerPolicy policy : policyList) {
+        System.out.println(policy.getName());
+      }
     }
+
+    // Examples for resourceMatchScope
+
+    // resourceMatchScope is used to match the resource
+    // 'self': Retrieves policies that exactly match the specified resource.
+    filter.put("resourceMatchScope", "self");
+    policyList = rangerClient.findPolicies(filter);
+    if (CollectionUtils.isNotEmpty(policyList)) {
+      // resourceMatchScope: 'self' — Retrieves policies that exactly match the specified resource.
+      // Policy for bucket2025/dir1
+      System.out.println("Found " + policyList.size() + " policies for resource with 'resourceMatchScope' as self");
+      for (RangerPolicy policy : policyList) {
+        System.out.println(policy.getName());
+      }
+    }
+
+    // resourceMatchScope: 'ancestor' — Retrieves policies where the specified resource in the filter is an ancestor of the policy resource.
+    // Valid only for resources with isRecursive set to true (e.g., objectpath).
+    filter.put("resourceMatchScope", "ancestor");
+    policyList = rangerClient.findPolicies(filter);
+    if (CollectionUtils.isNotEmpty(policyList)) {
+      // Should return 1 policy
+      // Policy for bucket2025/dir1/dir2
+      System.out.println("Found " + policyList.size() + " policies where 'resourceMatchScope' is set to ancestor. These are policies where 'dir1' is an ancestor resource.");
+      for (RangerPolicy policy : policyList) {
+        System.out.println(policy.getName());
+      }
+    }
+
+    // 'self_or_ancestor': Retrieves policies that either match the specified resource exactly or where the specified resource is an ancestor of the policy resource.
+    filter.put("resourceMatchScope", "self_or_ancestor");
+    policyList = rangerClient.findPolicies(filter);
+    if (CollectionUtils.isNotEmpty(policyList)) {
+      // Should return 2 policy
+      // Policy for bucket2025/dir1
+      // Policy for bucket2025/dir1/dir2
+      System.out.println("Found " + policyList.size() + " policies with 'resourceMatchScope' set to self_or_ancestor — covering cases where 'dir1' is either the resource itself or an ancestor.");
+      for (RangerPolicy policy : policyList) {
+        System.out.println(policy.getName());
+      }
+    }
+    // Clean up policies created
+    rangerClient.deletePolicy(rangerPolicy.getId());
+    rangerClient.deletePolicy(rangerPolicy1.getId());
   }
 
-  public static RangerPolicy generateRangerPolicy(String serviceTpe, String service) {
-    Map<String, RangerPolicy.RangerPolicyResource> resources = generateResources(serviceTpe);
+  // This method generates a Ranger policy for S3 service with the specified parameters.
+  public static RangerPolicy generateRangerPolicy(String serviceTpe, String service, String bucketName, String objectPath) {
+    Map<String, RangerPolicy.RangerPolicyResource> resources = generateS3Resources(bucketName, objectPath);
     RangerPolicy policy = new RangerPolicy();
     policy.setService(service);
-    policy.setName("ranger-policy-example");
+    policy.setName("Policy for " + bucketName + "/" + objectPath);
     policy.setDescription("Policy for " + serviceTpe);
     policy.setIsEnabled(true);
     policy.setIsAuditEnabled(true);
     policy.setResources(resources);
-    policy.setZoneName("SZ-1");
     policy.setPolicyItems(RangerPolicySearchDemo.getPolicyItems(Arrays.asList("user1", "user2"), Collections.EMPTY_LIST, Arrays.asList("ROLE_1", "ROLE_2")));
     policy.setServiceType(serviceTpe);
     return policy;
   }
 
+  // This method generates a list of policy items with the given principals for the Ranger policy.
   private static List<RangerPolicy.RangerPolicyItem> getPolicyItems(List<String> users, List<String> groups, List<String> roles) {
     RangerPolicy.RangerPolicyItem policyItem = new RangerPolicy.RangerPolicyItem();
     policyItem.setDelegateAdmin(false);
@@ -131,6 +186,7 @@ public class RangerPolicySearchDemo {
     return Arrays.asList(policyItem);
   }
 
+  // This method generates a list of S3 accesses permissions for the Ranger policy item.
   private static List<RangerPolicy.RangerPolicyItemAccess> getAccesses() {
     RangerPolicy.RangerPolicyItemAccess readAccess = new RangerPolicy.RangerPolicyItemAccess("read", true);
     RangerPolicy.RangerPolicyItemAccess writeAccess = new RangerPolicy.RangerPolicyItemAccess("write", true);
@@ -141,15 +197,11 @@ public class RangerPolicySearchDemo {
     return Arrays.asList(readAccess, writeAccess, deleteAccess, mWriteAccess, mReadAccess, adminAccess);
   }
 
-  private static Map<String, RangerPolicy.RangerPolicyResource> generateResources(String service) {
+  // This method generates S3 resources for the Ranger policy.
+  private static Map<String, RangerPolicy.RangerPolicyResource> generateS3Resources(String bucketName, String objectPath) {
     Map<String, RangerPolicy.RangerPolicyResource> resources = new HashMap<>();
-    String resource = "bucket2025";
-    switch (service) {
-      case "s3": {
-        resources.put("bucketname", new RangerPolicy.RangerPolicyResource(resource, false, false));
-        resources.put("objectpath", new RangerPolicy.RangerPolicyResource("/data/04042025/*" , false, false));
-      }
-    }
+    resources.put("bucketname", new RangerPolicy.RangerPolicyResource(bucketName, false, false));
+    resources.put("objectpath", new RangerPolicy.RangerPolicyResource(objectPath , false, true));
     return resources;
   }
 }
