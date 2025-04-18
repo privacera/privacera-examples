@@ -31,11 +31,12 @@ public class RangerSecurityZoneDemo {
   private static final String RANGER_SERVICE_TYPE = "s3";
 
 
-  private static final String RANGER_ADMIN_URL = "https://ranger-dev-pcloud-dev-apiserver.nextgen.privacera.us/api/0fca0637fccf5e0599fe6ec732befcff7fe27b4db6e4564faa3f2d1bd151612d"; // Replace with your Ranger server URL and port
-  private static final String SECURITY_ZONE_API_ENDPOINT = "/service/public/v2/api/zones"; // Example endpoint - adjust as needed
-  private static final String RANGER_ADMIN_USERNAME = "asit.vadhavkar"; // Replace with your Ranger username (if required)
-  private static final String RANGER_ADMIN_PASSWORD = "Welcome1"; // Replace with your Ranger password (if required)
-  private static final String ACCOUNT_ID = "17449867200003" ; // Replace with your Account Id
+  private static final String RANGER_ADMIN_URL = "https://ranger"; // Replace with your Ranger Admin URL. For Privacera Cloud : API Keys --> API Key Info --> Ranger Admin URL
+  private static final String SECURITY_ZONE_API_ENDPOINT = "/service/public/v2/api/zones"; // Endpoint for Security Zones
+  private static final String RANGER_ADMIN_USERNAME = "username"; // Replace with your Ranger username
+  private static final String RANGER_ADMIN_PASSWORD = "Password#12"; // Replace with your Ranger password
+  private static final String ACCOUNT_ID = "123839390303" ; // Replace with your Account ID
+  
   public static void main(String[] args) throws RangerServiceException {
 
 
