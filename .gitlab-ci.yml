@@ -9,7 +9,7 @@ cache:
 
 # Job for building Java project in subdirectory1
 build_access_dataserver:
-  image: 842030182425.dkr.ecr.us-east-1.amazonaws.com/privacera_build_jdk17:main-1.0.0.1-SNAPSHOT-latest
+  image: 058264211556.dkr.ecr.us-east-1.amazonaws.com/privacera_build_jdk17:latest
   tags:
     - privacera-ops-tf-glrunner
   stage: build
@@ -23,7 +23,7 @@ build_access_dataserver:
 
 # Periodic job to test all subfolders
 test_all_subfolders:
-  image: 842030182425.dkr.ecr.us-east-1.amazonaws.com/privacera_build_jdk17:main-1.0.0.1-SNAPSHOT-latest
+  image: 058264211556.dkr.ecr.us-east-1.amazonaws.com/privacera_build_jdk17:latest
   tags:
     - privacera-ops-tf-glrunner
   stage: build
