@@ -58,9 +58,9 @@ public class RangerServiceDemo {
     // Create Ranger client using the hostname, authentication type, username, password and configuration file
     RangerClient rangerClient = new RangerClient(hostName, authType, userName, password, cfg);
 
-    // Search Services — filter by service name prefix and service type
+    // Search Services — filter by partial service name and service type.
     Map<String, String> serviceFilter = new HashMap<>();
-    serviceFilter.put(SearchFilter.SERVICE_NAME_PREFIX, "privacera");
+    serviceFilter.put(SearchFilter.SERVICE_NAME_PARTIAL, "privacera");
     serviceFilter.put(SearchFilter.SERVICE_TYPE, RANGER_SERVICE_TYPE);
     serviceFilter.put(SearchFilter.START_INDEX, "0");
     serviceFilter.put(SearchFilter.PAGE_SIZE, "100");

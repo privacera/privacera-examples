@@ -14,12 +14,14 @@
     <commons.cli.version>1.2</commons.cli.version>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
+    <ranger.intg.version>d20b0b0eaa</ranger.intg.version>
+    <jersey.version>4.0.0</jersey.version>
   </properties>
   <dependencies>
     <dependency>
       <groupId>org.apache.ranger</groupId>
       <artifactId>ranger-intg</artifactId>
-      <version>2.6.0</version>
+      <version>${ranger.intg.version}</version>
       <scope>compile</scope>
       <exclusions>
         <exclusion>
@@ -35,7 +37,7 @@
     <dependency>
       <groupId>org.apache.ranger</groupId>
       <artifactId>ranger-plugins-common</artifactId>
-      <version>2.6.0</version>
+      <version>${ranger.intg.version}</version>
 <!--      <scope>compile</scope>-->
       <exclusions>
         <exclusion>
@@ -45,6 +47,10 @@
         <exclusion>
           <groupId>com.privacera.org.apache.solr</groupId>
           <artifactId>solr-solrj</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.fasterxml.jackson.module</groupId>
+          <artifactId>jackson-module-scala_2.13</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -68,7 +74,12 @@
     <dependency>
       <groupId>org.glassfish.jersey.media</groupId>
       <artifactId>jersey-media-json-jackson</artifactId>
-      <version>2.35</version>
+      <version>${jersey.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.inject</groupId>
+      <artifactId>jersey-hk2</artifactId>
+      <version>${jersey.version}</version>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
@@ -84,8 +95,17 @@
     </dependency>
   </dependencies>
   <repositories>
-
-
+    <repository>
+      <id>privacera-repo</id>
+      <name>Privacera Nexus</name>
+      <url>https://nexus.privacera.us/repository/privacera-new-repo</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
     <repository>
       <id>apache.snapshots.https</id>
       <name>Apache Development Snapshot Repository</name>
