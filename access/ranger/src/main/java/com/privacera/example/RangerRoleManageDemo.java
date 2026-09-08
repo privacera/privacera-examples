@@ -20,8 +20,6 @@ import org.apache.ranger.RangerServiceException;
 import org.apache.ranger.admin.client.datatype.RESTResponse;
 import org.apache.ranger.plugin.model.RangerRole;
 import org.apache.ranger.plugin.util.GrantRevokeRoleRequest;
-import org.apache.ranger.plugin.util.SearchFilter;
-
 public class RangerRoleManageDemo {
 
   private static final String RANGER_SERVICE = "privacera_s3";
@@ -77,9 +75,9 @@ public class RangerRoleManageDemo {
 
     // Search Roles — filter by partial role name
     Map<String, String> roleFilter = new HashMap<>();
-    roleFilter.put(SearchFilter.ROLE_NAME_PARTIAL, DEMO_ROLE_NAME);
-    roleFilter.put(SearchFilter.START_INDEX, "0");
-    roleFilter.put(SearchFilter.PAGE_SIZE, "100");
+    roleFilter.put("roleNamePartial", DEMO_ROLE_NAME);
+    roleFilter.put("startIndex", "0");
+    roleFilter.put("pageSize", "100");
 
     List<RangerRole> matchingRoles = rangerClient.findRoles(roleFilter);
     if (CollectionUtils.isNotEmpty(matchingRoles)) {
