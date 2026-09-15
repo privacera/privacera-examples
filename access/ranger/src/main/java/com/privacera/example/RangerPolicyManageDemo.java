@@ -67,36 +67,25 @@ public class RangerPolicyManageDemo {
 
     long policyId = createdPolicy.getId();
 
-    try {
-      // Get Policy by ID
-      RangerPolicy policyById = rangerClient.getPolicy(policyId);
-      System.out.println("Get policy by id: id=" + policyById.getId() + ", name=" + policyById.getName()
-          + ", description=" + policyById.getDescription());
+    // Get Policy by ID
+    RangerPolicy policyById = rangerClient.getPolicy(policyId);
+    System.out.println("Get policy by id: id=" + policyById.getId() + ", name=" + policyById.getName()
+        + ", description=" + policyById.getDescription());
 
-      // Get Policy by service name and policy name
-      RangerPolicy policyByName = rangerClient.getPolicy(RANGER_SERVICE, DEMO_POLICY_NAME);
-      System.out.println("Get policy by name: id=" + policyByName.getId() + ", service=" + policyByName.getService()
-          + ", name=" + policyByName.getName());
+    // Get Policy by service name and policy name
+    RangerPolicy policyByName = rangerClient.getPolicy(RANGER_SERVICE, DEMO_POLICY_NAME);
+    System.out.println("Get policy by name: id=" + policyByName.getId() + ", service=" + policyByName.getService()
+        + ", name=" + policyByName.getName());
 
-      // Update Policy
-      policyByName.setDescription("Updated by RangerPolicyManageDemo");
-      RangerPolicy updatedPolicy = rangerClient.updatePolicy(policyId, policyByName);
-      System.out.println("Updated policy: id=" + updatedPolicy.getId()
-          + ", description=" + updatedPolicy.getDescription());
-    } finally {
-      // Always remove the demo policy so a failed run does not block the next recreate
-      deletePolicyQuietly(rangerClient, policyId, DEMO_POLICY_NAME);
-    }
-  }
+    // Update Policy
+    policyByName.setDescription("Updated by RangerPolicyManageDemo");
+    RangerPolicy updatedPolicy = rangerClient.updatePolicy(policyId, policyByName);
+    System.out.println("Updated policy: id=" + updatedPolicy.getId()
+        + ", description=" + updatedPolicy.getDescription());
 
-  private static void deletePolicyQuietly(RangerClient rangerClient, long policyId, String policyName) {
-    try {
-      rangerClient.deletePolicy(policyId);
-      System.out.println("Deleted policy: id=" + policyId + ", name=" + policyName);
-    } catch (RangerServiceException exception) {
-      System.err.println("Failed to clean up demo policy id=" + policyId + ", name=" + policyName + ": "
-          + exception.getMessage());
-    }
+    // Delete Policy
+    rangerClient.deletePolicy(policyId);
+    System.out.println("Deleted policy: id=" + policyId + ", name=" + DEMO_POLICY_NAME);
   }
 
   // This method generates a Ranger policy for S3 service with the specified parameters.

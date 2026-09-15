@@ -15,8 +15,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.ranger.RangerClient;
 import org.apache.ranger.RangerServiceException;
 import org.apache.ranger.plugin.model.RangerService;
-import org.apache.ranger.plugin.util.SearchFilter;
-
 public class RangerServiceDemo {
 
   private static final String RANGER_SERVICE = "privacera_s3";
@@ -58,12 +56,12 @@ public class RangerServiceDemo {
     // Create Ranger client using the hostname, authentication type, username, password and configuration file
     RangerClient rangerClient = new RangerClient(hostName, authType, userName, password, cfg);
 
-    // Search Services — filter by service name prefix and service type
+    // Search Services — filter by partial service name and service type.
     Map<String, String> serviceFilter = new HashMap<>();
-    serviceFilter.put(SearchFilter.SERVICE_NAME_PREFIX, "privacera");
-    serviceFilter.put(SearchFilter.SERVICE_TYPE, RANGER_SERVICE_TYPE);
-    serviceFilter.put(SearchFilter.START_INDEX, "0");
-    serviceFilter.put(SearchFilter.PAGE_SIZE, "100");
+    serviceFilter.put("serviceNamePartial", "privacera");
+    serviceFilter.put("serviceType", RANGER_SERVICE_TYPE);
+    serviceFilter.put("startIndex", "0");
+    serviceFilter.put("pageSize", "100");
 
     List<RangerService> services = rangerClient.findServices(serviceFilter);
     if (CollectionUtils.isNotEmpty(services)) {

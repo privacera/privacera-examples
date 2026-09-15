@@ -10,16 +10,13 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.ranger.RangerClient;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class RangerUserGroupSearchDemo {
-
-  // User and group search endpoints are not available on RangerClient; use XUser REST API directly.
-  private static final String USERS_SEARCH_PATH = "/service/xusers/users";
-  private static final String GROUPS_SEARCH_PATH = "/service/xusers/groups";
 
   public static void main(String[] args) throws Exception {
 
@@ -54,7 +51,7 @@ public class RangerUserGroupSearchDemo {
     String cfg = cmd.getOptionValue('c');
     String authType = cmd.getOptionValue('k');
 
-    RangerAdminRestHelper restHelper = new RangerAdminRestHelper(hostName, authType, userName, password, cfg);
+    RangerClient rangerClient = new RangerClient(hostName, authType, userName, password, cfg);
 
     // Search Users — filter by partial user name (name query param)
     Map<String, String> userQuery = new HashMap<>();
@@ -62,7 +59,7 @@ public class RangerUserGroupSearchDemo {
     userQuery.put("pageSize", "25");
     userQuery.put("name", "user1");
 
-    String usersJson = restHelper.get(USERS_SEARCH_PATH, userQuery);
+    String usersJson = rangerClient.findUsers(userQuery);
 
     JsonObject usersResponse = JsonParser.parseString(usersJson).getAsJsonObject();
     JsonArray users = usersResponse.getAsJsonArray("vXUsers");
@@ -81,7 +78,7 @@ public class RangerUserGroupSearchDemo {
     groupQuery.put("pageSize", "25");
     groupQuery.put("name", "public");
 
-    String groupsJson = restHelper.get(GROUPS_SEARCH_PATH, groupQuery);
+    String groupsJson = rangerClient.findGroups(groupQuery);
 
     JsonObject groupsResponse = JsonParser.parseString(groupsJson).getAsJsonObject();
     JsonArray groups = groupsResponse.getAsJsonArray("vXGroups");

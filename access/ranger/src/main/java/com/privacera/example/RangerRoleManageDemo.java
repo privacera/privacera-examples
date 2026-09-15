@@ -20,8 +20,6 @@ import org.apache.ranger.RangerServiceException;
 import org.apache.ranger.admin.client.datatype.RESTResponse;
 import org.apache.ranger.plugin.model.RangerRole;
 import org.apache.ranger.plugin.util.GrantRevokeRoleRequest;
-import org.apache.ranger.plugin.util.SearchFilter;
-
 public class RangerRoleManageDemo {
 
   private static final String RANGER_SERVICE = "privacera_s3";
@@ -75,52 +73,41 @@ public class RangerRoleManageDemo {
     RangerRole createdRole = rangerClient.createRole(RANGER_SERVICE, roleToCreate);
     System.out.println("Created role: id=" + createdRole.getId() + ", name=" + createdRole.getName());
 
-    try {
-      // Search Roles — filter by partial role name
-      Map<String, String> roleFilter = new HashMap<>();
-      roleFilter.put(SearchFilter.ROLE_NAME_PARTIAL, DEMO_ROLE_NAME);
-      roleFilter.put(SearchFilter.START_INDEX, "0");
-      roleFilter.put(SearchFilter.PAGE_SIZE, "100");
+    // Search Roles — filter by partial role name
+    Map<String, String> roleFilter = new HashMap<>();
+    roleFilter.put("roleNamePartial", DEMO_ROLE_NAME);
+    roleFilter.put("startIndex", "0");
+    roleFilter.put("pageSize", "100");
 
-      List<RangerRole> matchingRoles = rangerClient.findRoles(roleFilter);
-      if (CollectionUtils.isNotEmpty(matchingRoles)) {
-        System.out.println("Found " + matchingRoles.size() + " roles matching filter:");
-        for (RangerRole role : matchingRoles) {
-          System.out.println("  id=" + role.getId() + ", name=" + role.getName());
-        }
+    List<RangerRole> matchingRoles = rangerClient.findRoles(roleFilter);
+    if (CollectionUtils.isNotEmpty(matchingRoles)) {
+      System.out.println("Found " + matchingRoles.size() + " roles matching filter:");
+      for (RangerRole role : matchingRoles) {
+        System.out.println("  id=" + role.getId() + ", name=" + role.getName());
       }
-
-      // Add User to Role — grantRole assigns the user to the target role via GrantRevokeRoleRequest
-      GrantRevokeRoleRequest grantRequest = new GrantRevokeRoleRequest();
-      grantRequest.setGrantor(userName);
-      Set<String> targetRoles = new HashSet<>();
-      targetRoles.add(DEMO_ROLE_NAME);
-      grantRequest.setTargetRoles(targetRoles);
-      Set<String> usersToGrant = new HashSet<>();
-      usersToGrant.add(DEMO_USER);
-      grantRequest.setUsers(usersToGrant);
-
-      RESTResponse grantResponse = rangerClient.grantRole(RANGER_SERVICE, grantRequest);
-      System.out.println("Added user '" + DEMO_USER + "' to role '" + DEMO_ROLE_NAME
-          + "': statusCode=" + grantResponse.getStatusCode() + ", message=" + grantResponse.getMessage());
-
-      // Verify role membership
-      RangerRole roleWithMembers = rangerClient.getRole(DEMO_ROLE_NAME, userName, RANGER_SERVICE);
-      System.out.println("Role after grant: name=" + roleWithMembers.getName()
-          + ", users=" + roleWithMembers.getUsers());
-    } finally {
-      // Always remove the demo role so a failed run does not block the next recreate
-      deleteRoleQuietly(rangerClient, DEMO_ROLE_NAME, userName, RANGER_SERVICE);
     }
-  }
 
-  private static void deleteRoleQuietly(RangerClient rangerClient, String roleName, String userName,
-      String serviceName) {
-    try {
-      rangerClient.deleteRole(roleName, userName, serviceName);
-      System.out.println("Deleted role: " + roleName);
-    } catch (RangerServiceException exception) {
-      System.err.println("Failed to clean up demo role '" + roleName + "': " + exception.getMessage());
-    }
+    // Add User to Role — grantRole assigns the user to the target role via GrantRevokeRoleRequest
+    GrantRevokeRoleRequest grantRequest = new GrantRevokeRoleRequest();
+    grantRequest.setGrantor(userName);
+    Set<String> targetRoles = new HashSet<>();
+    targetRoles.add(DEMO_ROLE_NAME);
+    grantRequest.setTargetRoles(targetRoles);
+    Set<String> usersToGrant = new HashSet<>();
+    usersToGrant.add(DEMO_USER);
+    grantRequest.setUsers(usersToGrant);
+
+    RESTResponse grantResponse = rangerClient.grantRole(RANGER_SERVICE, grantRequest);
+    System.out.println("Added user '" + DEMO_USER + "' to role '" + DEMO_ROLE_NAME
+        + "': statusCode=" + grantResponse.getStatusCode() + ", message=" + grantResponse.getMessage());
+
+    // Verify role membership
+    RangerRole roleWithMembers = rangerClient.getRole(DEMO_ROLE_NAME, userName, RANGER_SERVICE);
+    System.out.println("Role after grant: name=" + roleWithMembers.getName()
+        + ", users=" + roleWithMembers.getUsers());
+
+    // Delete Role
+    rangerClient.deleteRole(DEMO_ROLE_NAME, userName, RANGER_SERVICE);
+    System.out.println("Deleted role: " + DEMO_ROLE_NAME);
   }
 }
